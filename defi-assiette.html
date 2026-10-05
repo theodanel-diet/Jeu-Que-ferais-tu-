@@ -80,7 +80,7 @@ h1{
   background:white;
   border:3px solid var(--or);
   border-radius:15px;
-  padding:10px 5px;
+ padding:6px;
   font-weight:bold;
   cursor:pointer;
   min-height:55px;
@@ -89,7 +89,23 @@ h1{
   justify-content:center;
   transition:.15s;
 }
+.food-image{
+  width:100%;
+  aspect-ratio:1 / 1;
+  display:block;
+  background-image:url("./aliments-assiette.png");
+  background-size:500% 300%;
+  background-repeat:no-repeat;
+  border-radius:10px;
+}
 
+.food-name{
+  display:block;
+  margin-top:5px;
+  font-size:14px;
+  color:var(--bordeaux);
+  font-weight:bold;
+}
 .aliment:active{
   transform:scale(.96);
 }
@@ -144,7 +160,24 @@ h1{
   color:var(--bordeaux);
   font-size:17px;
 }
+.zone-image{
+  width:110px;
+  max-width:90%;
+  aspect-ratio:1 / 1;
+  display:block;
+  margin:0 auto 5px;
+  background-image:url("./aliments-assiette.png");
+  background-size:500% 300%;
+  background-repeat:no-repeat;
+  border-radius:12px;
+}
 
+.zone-nom{
+  display:block;
+  font-size:14px;
+  font-weight:bold;
+  color:var(--bordeaux);
+}
 .contenu-zone{
   font-weight:bold;
   font-size:18px;
@@ -272,24 +305,23 @@ button{
 <script>
 
 const aliments = [
-  {nom:"Brocoli", categorie:"legumes"},
-  {nom:"Carotte", categorie:"legumes"},
-  {nom:"Courgette", categorie:"legumes"},
+  {nom:"Brocoli", categorie:"legumes", position:"0% 0%"},
+  {nom:"Carotte", categorie:"legumes", position:"25% 0%"},
+  {nom:"Courgette", categorie:"legumes", position:"50% 0%"},
+  {nom:"Riz", categorie:"feculents", position:"75% 0%"},
+  {nom:"Pâtes", categorie:"feculents", position:"100% 0%"},
 
-  {nom:"Riz", categorie:"feculents"},
-  {nom:"Pâtes", categorie:"feculents"},
-  {nom:"Pommes de terre", categorie:"feculents"},
+  {nom:"Pommes de terre", categorie:"feculents", position:"0% 50%"},
+  {nom:"Lentilles", categorie:"proteines", position:"25% 50%"},
+  {nom:"Œuf", categorie:"proteines", position:"50% 50%"},
+  {nom:"Poisson", categorie:"proteines", position:"75% 50%"},
+  {nom:"Poulet", categorie:"proteines", position:"100% 50%"},
 
-  {nom:"Lentilles", categorie:"proteines"},
-  {nom:"Œuf", categorie:"proteines"},
-  {nom:"Poisson", categorie:"proteines"},
-  {nom:"Poulet", categorie:"proteines"},
-
-  {nom:"Frites", categorie:"piege"},
-  {nom:"Burger", categorie:"piege"},
-  {nom:"Pizza", categorie:"piege"},
-  {nom:"Nuggets", categorie:"piege"},
-  {nom:"Cookie", categorie:"piege"}
+  {nom:"Frites", categorie:"piege", position:"0% 100%"},
+  {nom:"Burger", categorie:"piege", position:"25% 100%"},
+  {nom:"Pizza", categorie:"piege", position:"50% 100%"},
+  {nom:"Nuggets", categorie:"piege", position:"75% 100%"},
+  {nom:"Cookie", categorie:"piege", position:"100% 100%"}
 ];
 
 let selection = null;
@@ -320,7 +352,9 @@ function demarrer(){
     const bouton=document.createElement("div");
 
     bouton.className="aliment";
-    bouton.textContent=a.nom;
+    bouton.innerHTML =
+  '<span class="food-image" style="background-position:'+a.position+'"></span>' +
+  '<span class="food-name">'+a.nom+'</span>';
     bouton.dataset.nom=a.nom;
     bouton.dataset.categorie=a.categorie;
 
@@ -350,9 +384,11 @@ function afficherZones(){
 
     const emplacement=document.getElementById(zone);
 
-    if(choix[zone]){
-      emplacement.textContent=choix[zone].nom;
-    }else{
+   if(choix[zone]){
+  emplacement.innerHTML =
+    '<span class="zone-image" style="background-position:'+choix[zone].position+'"></span>' +
+    '<span class="zone-nom">'+choix[zone].nom+'</span>';
+}else{
       emplacement.innerHTML='<span class="vide">Choisis un aliment</span>';
     }
 
