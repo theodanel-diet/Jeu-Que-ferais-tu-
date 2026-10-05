@@ -71,40 +71,41 @@ h1 {
   border-radius: 12px;
 }
 
-/* Zones tactiles totalement invisibles */
+/* ZONES TACTILES INVISIBLES */
 
 .target {
   position: absolute;
   cursor: pointer;
   background: transparent;
-  border: none;
-  outline: none;
+  border: 0;
+  outline: 0;
   padding: 0;
+  margin: 0;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Glucides pour 100 g */
+/* 68 g — Glucides pour 100 g */
 #carbs100 {
-  left: 49%;
-  top: 48%;
-  width: 11%;
+  left: 39.5%;
+  top: 46%;
+  width: 7%;
   height: 5%;
 }
 
-/* Glucides par portion */
+/* 20,4 g — Glucides par portion */
 #carbsPortion {
-  left: 60%;
-  top: 48%;
-  width: 12%;
+  left: 46.5%;
+  top: 46%;
+  width: 9%;
   height: 5%;
 }
 
-/* Liste des ingrédients */
+/* Liste complète des ingrédients */
 #ingredients {
-  left: 74%;
-  top: 35%;
-  width: 22%;
-  height: 22%;
+  left: 56%;
+  top: 31%;
+  width: 23%;
+  height: 23%;
 }
 
 .feedback {
@@ -175,7 +176,7 @@ Observe bien l'emballage puis lance le chrono quand tu es prêt !
 
 <div class="timer" id="timer">30 s</div>
 
-<div class="mission" id="mission">
+<div class="mission">
 <strong>À retrouver en 30 secondes :</strong><br><br>
 Glucides pour 100 g<br>
 Glucides par portion<br>
@@ -333,26 +334,26 @@ function endGame(success) {
       "<strong>Les réponses étaient :</strong><br>" +
       "Glucides pour 100 g : <strong>68 g</strong><br>" +
       "Glucides par portion : <strong>20,4 g</strong><br>" +
-      "Liste des ingrédients : <strong>à droite du tableau nutritionnel</strong><br><br>" +
+      "La liste des ingrédients se trouve à droite du tableau nutritionnel.<br><br>" +
       "Observe l'emballage puis essaie à nouveau !";
   }
 }
 
 document
   .getElementById("carbs100")
-  .addEventListener("click", () => {
+  .addEventListener("click", function() {
     targetPressed("carbs100");
   });
 
 document
   .getElementById("carbsPortion")
-  .addEventListener("click", () => {
+  .addEventListener("click", function() {
     targetPressed("carbsPortion");
   });
 
 document
   .getElementById("ingredients")
-  .addEventListener("click", () => {
+  .addEventListener("click", function() {
     targetPressed("ingredients");
   });
 
