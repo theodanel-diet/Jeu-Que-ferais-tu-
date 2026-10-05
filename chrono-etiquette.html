@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Chrono étiquette</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 18px;
+  background: #f4e6c7;
+  color: #352724;
+  font-family: Georgia, "Times New Roman", serif;
+  text-align: center;
+}
+
+.game {
+  max-width: 720px;
+  margin: auto;
+}
+
+h1 {
+  color: #5b2b2c;
+  margin: 6px 0;
+  font-size: 30px;
+}
+
+.intro {
+  line-height: 1.4;
+  margin-bottom: 15px;
+}
+
+.timer {
+  display: inline-block;
+  background: #5b2b2c;
+  color: white;
+  font-size: 27px;
+  font-weight: bold;
+  padding: 9px 18px;
+  border-radius: 14px;
+  margin: 8px 0 14px;
+}
+
+.mission {
+  background: #fff8e9;
+  border: 2px solid #e7ad43;
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 14px;
+  font-weight: bold;
+  min-height: 50px;
+}
+
+.image-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  margin: auto;
+}
+
+.image-wrap img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+/* Zones invisibles placées sur l'emballage */
+
+.target {
+  position: absolute;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Tableau nutritionnel :
+   ligne Glucides / colonne 100 g */
+#carbs100 {
+  left: 30%;
+  top: 39%;
+  width: 9%;
+  height: 4%;
+}
+
+/* Tableau nutritionnel :
+   ligne Glucides / colonne portion */
+#carbsPortion {
+  left: 39%;
+  top: 39%;
+  width: 10%;
+  height: 4%;
+}
+
+/* Liste des ingrédients */
+#ingredients {
+  left: 26%;
+  top: 58%;
+  width: 25%;
+  height: 12%;
+}
+
+.feedback {
+  min-height: 28px;
+  margin-top: 12px;
+  font-weight: bold;
+}
+
+.correct {
+  color: #4f7b58;
+}
+
+.wrong {
+  color: #a54b43;
+}
+
+button.control {
+  border: none;
+  border-radius: 12px;
+  padding: 13px 22px;
+  margin: 12px 5px 5px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#start {
+  background: #5b2b2c;
+  color: white;
+}
+
+#replay {
+  background: #e7ad43;
+  color: #352724;
+  display: none;
+}
+
+#result {
+  display: none;
+  margin-top: 16px;
+  padding: 15px;
+  border-radius: 14px;
+  font-weight: bold;
+  line-height: 1.5;
+}
+
+.success {
+  display: block !important;
+  background: #dcebdc;
+  color: #35543c;
+}
+
+.fail {
+  display: block !important;
+  background: #f2d8d5;
+  color: #7b3732;
+}
+
+.finished-target {
+  outline: 3px solid #4f7b58;
+  outline-offset: 2px;
+  border-radius: 5px;
+  background: rgba(79,123,88,0.12);
+}
+
+.reveal-target {
+  outline: 3px solid #e7ad43;
+  outline-offset: 2px;
+  border-radius: 5px;
+  background: rgba(231,173,67,0.18);
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+<h1>⏱️ Chrono étiquette</h1>
+
+<p class="intro">
+Tu as <strong>30 secondes</strong> pour retrouver
+3 informations sur cet emballage.
+</p>
+
+<div class="timer" id="timer">30 s</div>
+
+<div class="mission" id="mission">
+Appuie sur « Démarrer » quand tu es prêt !
+</div>
+
+<div class="image-wrap">
+
+  <img
+    src="emballage-cereales.png"
+    alt="Dos d'un paquet de céréales avec tableau nutritionnel et liste des ingrédients"
+  >
+
+  <button class="target" id="carbs100"
+    aria-label="Glucides pour 100 grammes"></button>
+
+  <button class="target" id="carbsPortion"
+    aria-label="Glucides par portion"></button>
+
+  <button class="target" id="ingredients"
+    aria-label="Liste des ingrédients"></button>
+
+</div>
+
+<div class="feedback" id="feedback"></div>
+
+<button class="control" id="start">
+Démarrer
+</button>
+
+<button class="control" id="replay">
+Rejouer
+</button>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+const missions = [
+  {
+    id: "carbs100",
+    text: "Trouve les glucides pour 100 g",
+    answer: "68 g pour 100 g"
+  },
+  {
+    id: "carbsPortion",
+    text: "Trouve les glucides pour une portion de 30 g",
+    answer: "20,4 g par portion"
+  },
+  {
+    id: "ingredients",
+    text: "Trouve la liste des ingrédients",
+    answer: "Liste des ingrédients trouvée"
+  }
+];
+
+let currentMission = 0;
+let timeLeft = 30;
+let timerInterval = null;
+let started = false;
+
+const timer = document.getElementById("timer");
+const mission = document.getElementById("mission");
+const feedback = document.getElementById("feedback");
+const result = document.getElementById("result");
+const startButton = document.getElementById("start");
+const replayButton = document.getElementById("replay");
+
+function startGame() {
+
+  clearInterval(timerInterval);
+
+  currentMission = 0;
+  timeLeft = 30;
+  started = true;
+
+  timer.textContent = "30 s";
+
+  mission.textContent = "1/3 — " + missions[0].text;
+
+  feedback.textContent = "";
+  feedback.className = "feedback";
+
+  result.className = "";
+  result.style.display = "none";
+  result.innerHTML = "";
+
+  startButton.style.display = "none";
+  replayButton.style.display = "none";
+
+  document.querySelectorAll(".target").forEach(target => {
+    target.classList.remove(
+      "finished-target",
+      "reveal-target"
+    );
+  });
+
+  timerInterval = setInterval(() => {
+
+    timeLeft--;
+
+    timer.textContent = timeLeft + " s";
+
+    if (timeLeft <= 0) {
+      endGame(false);
+    }
+
+  }, 1000);
+}
+
+function targetPressed(id) {
+
+  if (!started) return;
+
+  const expected = missions[currentMission];
+
+  if (id === expected.id) {
+
+    document
+      .getElementById(id)
+      .classList.add("finished-target");
+
+    feedback.textContent =
+      "✅ " + expected.answer;
+
+    feedback.className = "feedback correct";
+
+    currentMission++;
+
+    if (currentMission === missions.length) {
+
+      endGame(true);
+      return;
+    }
+
+    setTimeout(() => {
+
+      if (!started) return;
+
+      mission.textContent =
+        (currentMission + 1) +
+        "/3 — " +
+        missions[currentMission].text;
+
+      feedback.textContent = "";
+
+    }, 650);
+
+  } else {
+
+    feedback.textContent =
+      "👀 Ce n'est pas cette information. Cherche encore !";
+
+    feedback.className = "feedback wrong";
+  }
+}
+
+function endGame(success) {
+
+  clearInterval(timerInterval);
+  started = false;
+
+  replayButton.style.display = "inline-block";
+
+  if (success) {
+
+    const elapsed = 30 - timeLeft;
+
+    mission.textContent =
+      "Mission accomplie !";
+
+    result.className = "success";
+
+    result.innerHTML =
+      "🎉 Bravo ! Tu as retrouvé les 3 informations en " +
+      elapsed +
+      " seconde" +
+      (elapsed > 1 ? "s" : "") +
+      " !";
+
+  } else {
+
+    timer.textContent = "0 s";
+
+    mission.textContent =
+      "Temps écoulé !";
+
+    result.className = "fail";
+
+    result.innerHTML =
+      "⏱️ Temps écoulé ! Les bonnes zones sont maintenant indiquées. Observe-les puis essaie à nouveau.";
+
+    document.querySelectorAll(".target").forEach(target => {
+      target.classList.add("reveal-target");
+    });
+  }
+}
+
+document
+  .getElementById("carbs100")
+  .addEventListener("click", () => {
+    targetPressed("carbs100");
+  });
+
+document
+  .getElementById("carbsPortion")
+  .addEventListener("click", () => {
+    targetPressed("carbsPortion");
+  });
+
+document
+  .getElementById("ingredients")
+  .addEventListener("click", () => {
+    targetPressed("ingredients");
+  });
+
+startButton.addEventListener("click", startGame);
+replayButton.addEventListener("click", startGame);
+
+</script>
+
+</body>
+</html>
