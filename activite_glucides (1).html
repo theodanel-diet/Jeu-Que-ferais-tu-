@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Les glucides - Activité</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f7f3ea;
+    color: #25313b;
+    min-height: 100vh;
+  }
+  .page {
+    max-width: 900px;
+    margin: auto;
+    padding: 24px 18px 35px;
+    text-align: center;
+  }
+  h1 {
+    margin: 5px 0 18px;
+    font-size: clamp(26px, 6vw, 42px);
+    color: #8b4b2f;
+  }
+  .question {
+    background: white;
+    border-radius: 22px;
+    padding: 20px;
+    box-shadow: 0 5px 18px rgba(0,0,0,.08);
+    font-size: clamp(19px, 4vw, 26px);
+    line-height: 1.35;
+    margin-bottom: 24px;
+  }
+  .question strong { color: #8b4b2f; }
+  .foods {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    max-width: 700px;
+    margin: 0 auto 24px;
+  }
+  .food {
+    border: 4px solid transparent;
+    background: white;
+    border-radius: 22px;
+    padding: 12px 10px 14px;
+    min-height: 210px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .12s, border-color .12s, background .12s;
+    box-shadow: 0 5px 15px rgba(0,0,0,.07);
+  }
+  .food:active { transform: scale(.97); }
+  .food.selected {
+    border-color: #3d8b5d;
+    background: #e9f7ed;
+  }
+  .food .illustration {
+    height: 145px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .food svg {
+    width: 145px;
+    height: 125px;
+    overflow: visible;
+  }
+  .name {
+    font-size: 23px;
+    font-weight: bold;
+    margin-top: 4px;
+  }
+  .check {
+    display: inline-block;
+    margin-top: 7px;
+    min-height: 24px;
+    font-size: 18px;
+    color: #3d8b5d;
+    font-weight: bold;
+  }
+  button {
+    border: 0;
+    border-radius: 18px;
+    padding: 15px 32px;
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+    background: #8b4b2f;
+    cursor: pointer;
+    box-shadow: 0 5px 12px rgba(0,0,0,.15);
+  }
+  button:active { transform: translateY(2px); }
+  #result {
+    display: none;
+    margin: 24px auto 0;
+    max-width: 700px;
+    border-radius: 22px;
+    padding: 20px;
+    font-size: 21px;
+    line-height: 1.45;
+    background: white;
+  }
+  #result.success {
+    display: block;
+    background: #e9f7ed;
+    border: 3px solid #3d8b5d;
+  }
+  #result.error {
+    display: block;
+    background: #fff1e9;
+    border: 3px solid #c66b3d;
+  }
+  .small { font-size: 17px; margin-top: 8px; }
+  @media (max-width: 520px) {
+    .foods { gap: 10px; }
+    .food { min-height: 180px; padding: 8px; }
+    .food .illustration { height: 115px; }
+    .food svg { width: 115px; height: 105px; }
+    .name { font-size: 20px; }
+    .check { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>🥣 Les glucides</h1>
+
+  <div class="question">
+    Tu as devant toi une pomme, du pain, du fromage et du riz.<br>
+    <strong>Lesquels contiennent des glucides ?</strong><br>
+    <span class="small">Touche ceux que tu choisis.</span>
+  </div>
+
+  <div class="foods">
+    <!-- Pomme -->
+    <div class="food" data-food="pomme" onclick="toggleFood(this)">
+      <div class="illustration">
+        <svg viewBox="0 0 160 140" aria-label="Illustration d'une pomme">
+          <path d="M83 31 C74 18 80 8 95 5" fill="none" stroke="#5c7f3c" stroke-width="7" stroke-linecap="round"/>
+          <ellipse cx="103" cy="18" rx="22" ry="9" transform="rotate(-22 103 18)" fill="#6e9b45"/>
+          <path d="M82 38 C56 20 24 38 26 72 C28 105 51 127 80 130 C109 127 132 105 134 72 C136 38 105 20 82 38Z" fill="#d84b3e"/>
+          <path d="M38 61 C34 82 44 101 58 108" fill="none" stroke="#ef8b76" stroke-width="6" stroke-linecap="round" opacity=".65"/>
+        </svg>
+      </div>
+      <div class="name">Pomme</div><div class="check"></div>
+    </div>
+
+    <!-- Pain -->
+    <div class="food" data-food="pain" onclick="toggleFood(this)">
+      <div class="illustration">
+        <svg viewBox="0 0 160 140" aria-label="Illustration d'une baguette de pain">
+          <path d="M22 82 C29 51 55 31 88 29 C119 27 139 43 137 67 C135 92 112 112 79 116 C48 120 18 109 22 82Z" fill="#d99a4a"/>
+          <path d="M45 61 L62 72" stroke="#9d6330" stroke-width="6" stroke-linecap="round"/>
+          <path d="M68 45 L85 56" stroke="#9d6330" stroke-width="6" stroke-linecap="round"/>
+          <path d="M92 40 L108 50" stroke="#9d6330" stroke-width="6" stroke-linecap="round"/>
+          <path d="M52 91 C72 98 93 93 110 83" fill="none" stroke="#edbd6e" stroke-width="7" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="name">Pain</div><div class="check"></div>
+    </div>
+
+    <!-- Fromage -->
+    <div class="food" data-food="fromage" onclick="toggleFood(this)">
+      <div class="illustration">
+        <svg viewBox="0 0 160 140" aria-label="Illustration d'un morceau de fromage">
+          <path d="M25 101 L116 119 L139 52 L52 30 Z" fill="#f3c84b" stroke="#c49324" stroke-width="5" stroke-linejoin="round"/>
+          <path d="M25 101 L52 30 L34 55 Z" fill="#ffd96a"/>
+          <circle cx="82" cy="67" r="7" fill="#c49324"/>
+          <circle cx="109" cy="87" r="5" fill="#c49324"/>
+          <circle cx="61" cy="88" r="6" fill="#c49324"/>
+        </svg>
+      </div>
+      <div class="name">Fromage</div><div class="check"></div>
+    </div>
+
+    <!-- Riz -->
+    <div class="food" data-food="riz" onclick="toggleFood(this)">
+      <div class="illustration">
+        <svg viewBox="0 0 160 140" aria-label="Illustration d'un bol de riz">
+          <path d="M28 73 C31 112 52 126 80 128 C108 126 129 112 132 73Z" fill="#8bb4c7" stroke="#527f91" stroke-width="5"/>
+          <path d="M23 67 C23 54 48 48 80 48 C112 48 137 54 137 67 C137 79 112 87 80 87 C48 87 23 79 23 67Z" fill="#f5f1e8" stroke="#527f91" stroke-width="5"/>
+          <ellipse cx="80" cy="59" rx="45" ry="17" fill="#fffdf7"/>
+          <ellipse cx="58" cy="58" rx="6" ry="3" fill="#e4dccb"/>
+          <ellipse cx="77" cy="53" rx="6" ry="3" fill="#e4dccb"/>
+          <ellipse cx="96" cy="59" rx="6" ry="3" fill="#e4dccb"/>
+          <ellipse cx="68" cy="65" rx="6" ry="3" fill="#e4dccb"/>
+          <ellipse cx="88" cy="66" rx="6" ry="3" fill="#e4dccb"/>
+        </svg>
+      </div>
+      <div class="name">Riz</div><div class="check"></div>
+    </div>
+  </div>
+
+  <button onclick="validate()">Valider mes réponses</button>
+
+  <div id="result"></div>
+</div>
+
+<script>
+const correct = new Set(["pomme", "pain", "riz"]);
+const selected = new Set();
+
+function toggleFood(card) {
+  const food = card.dataset.food;
+  if (selected.has(food)) {
+    selected.delete(food);
+    card.classList.remove("selected");
+    card.querySelector(".check").textContent = "";
+  } else {
+    selected.add(food);
+    card.classList.add("selected");
+    card.querySelector(".check").textContent = "✓ Sélectionné";
+  }
+  document.getElementById("result").style.display = "none";
+}
+
+function validate() {
+  const result = document.getElementById("result");
+  const good = selected.size === correct.size && [...correct].every(x => selected.has(x));
+
+  if (good) {
+    result.className = "success";
+    result.innerHTML = "<strong>🎉 Bravo !</strong><br>Tu as trouvé les trois bons aliments : <strong>la pomme, le pain et le riz</strong>.<br><span class='small'>Ces aliments contiennent des glucides.</span>";
+  } else {
+    result.className = "error";
+    const missing = [...correct].filter(x => !selected.has(x));
+    const extra = [...selected].filter(x => !correct.has(x));
+    let msg = "<strong>Pas tout à fait !</strong><br>";
+    if (missing.length) msg += "Il te manque : <strong>" + missing.join(", ") + "</strong>.<br>";
+    if (extra.length) msg += "Tu as aussi sélectionné : <strong>" + extra.join(", ") + "</strong>.<br>";
+    msg += "<span class='small'>Réessaie en sélectionnant uniquement les aliments qui contiennent des glucides.</span>";
+    result.innerHTML = msg;
+  }
+  result.scrollIntoView({behavior:"smooth", block:"center"});
+}
+</script>
+</body>
+</html>
