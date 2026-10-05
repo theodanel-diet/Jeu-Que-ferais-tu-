@@ -67,8 +67,6 @@ h1{
   font-style:italic;
 }
 
-/* ALIMENTS */
-
 .aliments{
   display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -80,28 +78,22 @@ h1{
   background:white;
   border:3px solid var(--or);
   border-radius:15px;
- padding:6px;
+  padding:6px;
   font-weight:bold;
   cursor:pointer;
-  min-height:120px;
- display:flex;
-flex-direction:column;
-align-items:stretch;
-justify-content:center;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
   transition:.15s;
+  overflow:hidden;
 }
+
 .food-image{
   width:100%;
-  height:105px;
+  aspect-ratio:3 / 2;
   display:block;
-  flex-shrink:0;
-
-  background-image:url("./aliments-assiette.png");
-  background-size:500% 300%;
-  background-repeat:no-repeat;
-
-  border-radius:15px;
-  overflow:hidden;
+  object-fit:cover;
+  border-radius:10px;
 }
 
 .food-name{
@@ -111,6 +103,7 @@ justify-content:center;
   color:var(--bordeaux);
   font-weight:bold;
 }
+
 .aliment:active{
   transform:scale(.96);
 }
@@ -118,8 +111,6 @@ justify-content:center;
 .aliment.selectionne{
   outline:4px solid var(--vert);
 }
-
-/* ASSIETTE */
 
 .assiette{
   width:min(500px,100%);
@@ -165,18 +156,14 @@ justify-content:center;
   color:var(--bordeaux);
   font-size:17px;
 }
+
 .zone-image{
   width:110px;
-  height:auto;
-aspect-ratio:3 / 2;
+  aspect-ratio:3 / 2;
   display:block;
-  flex-shrink:0;
+  object-fit:cover;
   margin:0 auto 5px;
-  background-image:url("./aliments-assiette.png");
-  background-size:500% 300%;
-  background-repeat:no-repeat;
   border-radius:12px;
-  overflow:hidden;
 }
 
 .zone-nom{
@@ -185,6 +172,7 @@ aspect-ratio:3 / 2;
   font-weight:bold;
   color:var(--bordeaux);
 }
+
 .contenu-zone{
   font-weight:bold;
   font-size:18px;
@@ -196,8 +184,6 @@ aspect-ratio:3 / 2;
   font-weight:normal;
   opacity:.6;
 }
-
-/* BOUTONS */
 
 button{
   border:0;
@@ -236,19 +222,11 @@ button{
     grid-template-columns:repeat(3,1fr);
   }
 
-  .aliment{
-    font-size:13px;
-  }
-
   h1{font-size:22px}
 
-  .zone h2{
-    font-size:14px;
-  }
+  .zone h2{font-size:14px}
 
-  .contenu-zone{
-    font-size:14px;
-  }
+  .contenu-zone{font-size:14px}
 }
 </style>
 </head>
@@ -310,25 +288,25 @@ button{
 </div>
 
 <script>
-
 const aliments = [
-  {nom:"Brocoli", categorie:"legumes", position:"0% 0%"},
-  {nom:"Carotte", categorie:"legumes", position:"25% 0%"},
-  {nom:"Courgette", categorie:"legumes", position:"50% 0%"},
-  {nom:"Riz", categorie:"feculents", position:"75% 0%"},
-  {nom:"Pâtes", categorie:"feculents", position:"100% 0%"},
+  {nom:"Brocoli", categorie:"legumes", image:"brocoli.png"},
+  {nom:"Carotte", categorie:"legumes", image:"carotte.png"},
+  {nom:"Courgette", categorie:"legumes", image:"courgette.png"},
 
-  {nom:"Pommes de terre", categorie:"feculents", position:"0% 50%"},
-  {nom:"Lentilles", categorie:"proteines", position:"25% 50%"},
-  {nom:"Œuf", categorie:"proteines", position:"50% 50%"},
-  {nom:"Poisson", categorie:"proteines", position:"75% 50%"},
-  {nom:"Poulet", categorie:"proteines", position:"100% 50%"},
+  {nom:"Riz", categorie:"feculents", image:"riz.png"},
+  {nom:"Pâtes", categorie:"feculents", image:"pates.png"},
+  {nom:"Pommes de terre", categorie:"feculents", image:"pommes-de-terre.png"},
 
-  {nom:"Frites", categorie:"piege", position:"0% 100%"},
-  {nom:"Burger", categorie:"piege", position:"25% 100%"},
-  {nom:"Pizza", categorie:"piege", position:"50% 100%"},
-  {nom:"Nuggets", categorie:"piege", position:"75% 100%"},
-  {nom:"Cookie", categorie:"piege", position:"100% 100%"}
+  {nom:"Lentilles", categorie:"proteines", image:"lentilles.png"},
+  {nom:"Œuf", categorie:"proteines", image:"oeuf.png"},
+  {nom:"Poisson", categorie:"proteines", image:"poisson.png"},
+  {nom:"Poulet", categorie:"proteines", image:"poulet.png"},
+
+  {nom:"Frites", categorie:"piege", image:"frites.png"},
+  {nom:"Burger", categorie:"piege", image:"burger.png"},
+  {nom:"Pizza", categorie:"piege", image:"pizza.png"},
+  {nom:"Nuggets", categorie:"piege", image:"nuggets.png"},
+  {nom:"Cookie", categorie:"piege", image:"cookie.png"}
 ];
 
 let selection = null;
@@ -344,7 +322,6 @@ function melanger(tableau){
 }
 
 function demarrer(){
-
   selection=null;
 
   choix.legumes=null;
@@ -355,28 +332,22 @@ function demarrer(){
   conteneur.innerHTML="";
 
   melanger(aliments).forEach(a=>{
-
     const bouton=document.createElement("div");
-
     bouton.className="aliment";
+
     bouton.innerHTML =
-  '<span class="food-image" style="background-position:'+a.position+'"></span>' +
-  '<span class="food-name">'+a.nom+'</span>';
-    bouton.dataset.nom=a.nom;
-    bouton.dataset.categorie=a.categorie;
+      '<img class="food-image" src="./'+a.image+'" alt="'+a.nom+'">' +
+      '<span class="food-name">'+a.nom+'</span>';
 
     bouton.addEventListener("click",()=>{
-
       document.querySelectorAll(".aliment")
         .forEach(x=>x.classList.remove("selectionne"));
 
       selection=a;
       bouton.classList.add("selectionne");
-
     });
 
     conteneur.appendChild(bouton);
-
   });
 
   afficherZones();
@@ -386,85 +357,62 @@ function demarrer(){
 }
 
 function afficherZones(){
-
   ["legumes","feculents","proteines"].forEach(zone=>{
-
     const emplacement=document.getElementById(zone);
 
-   if(choix[zone]){
-  emplacement.innerHTML =
-    '<span class="zone-image" style="background-position:'+choix[zone].position+'"></span>' +
-    '<span class="zone-nom">'+choix[zone].nom+'</span>';
-}else{
-      emplacement.innerHTML='<span class="vide">Choisis un aliment</span>';
+    if(choix[zone]){
+      emplacement.innerHTML =
+        '<img class="zone-image" src="./'+choix[zone].image+'" alt="'+choix[zone].nom+'">' +
+        '<span class="zone-nom">'+choix[zone].nom+'</span>';
+    }else{
+      emplacement.innerHTML=
+        '<span class="vide">Choisis un aliment</span>';
     }
-
   });
-
 }
 
 document.querySelectorAll(".zone").forEach(zone=>{
-
   zone.addEventListener("click",()=>{
-
     if(!selection) return;
 
     const destination=zone.dataset.zone;
-
     choix[destination]=selection;
-
     selection=null;
 
     document.querySelectorAll(".aliment")
       .forEach(x=>x.classList.remove("selectionne"));
 
     afficherZones();
-
   });
-
 });
 
 document.getElementById("valider").addEventListener("click",()=>{
-
   const message=document.getElementById("message");
 
   if(!choix.legumes || !choix.feculents || !choix.proteines){
-
     message.textContent=
       "Il manque encore un aliment dans ton assiette !";
-
     return;
   }
 
-  const legumesOK =
-    choix.legumes.categorie==="legumes";
-
-  const feculentsOK =
-    choix.feculents.categorie==="feculents";
-
-  const proteinesOK =
-    choix.proteines.categorie==="proteines";
+  const legumesOK=choix.legumes.categorie==="legumes";
+  const feculentsOK=choix.feculents.categorie==="feculents";
+  const proteinesOK=choix.proteines.categorie==="proteines";
 
   if(legumesOK && feculentsOK && proteinesOK){
-
     message.textContent=
       "Bravo ! Ton assiette contient un légume, un féculent et une source de protéines !";
-
   }else{
-
     message.textContent=
       "Il y a un petit piège dans ton assiette. Regarde bien tes choix et essaie encore !";
-
   }
 
   document.getElementById("rejouer").style.display="inline-block";
-
 });
 
 document.getElementById("rejouer").addEventListener("click",demarrer);
 
 demarrer();
-
 </script>
 
 </body>
