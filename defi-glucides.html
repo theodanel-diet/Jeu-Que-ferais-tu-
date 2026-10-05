@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Défi glucides - Que ferais-tu ?</title>
+
+<style>
+:root{
+  --creme:#f4e6c7;
+  --papier:#fff8e9;
+  --or:#e7ad43;
+  --bordeaux:#5b2b2c;
+  --vert:#4f7b58;
+  --texte:#352724;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  padding:18px;
+  background:var(--creme);
+  color:var(--texte);
+  font-family:Georgia,serif;
+  text-align:center;
+}
+
+.logo{
+  color:var(--bordeaux);
+  font-size:30px;
+  font-weight:bold;
+  margin:8px 0 14px;
+}
+
+.jeu{
+  max-width:800px;
+  margin:auto;
+  background:var(--papier);
+  border:3px solid var(--bordeaux);
+  border-radius:24px;
+  padding:18px;
+}
+
+.entete{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.badge{
+  background:var(--or);
+  color:var(--bordeaux);
+  font-weight:bold;
+  padding:9px 18px;
+  border-radius:20px;
+}
+
+.chrono{
+  background:var(--bordeaux);
+  color:white;
+  font-weight:bold;
+  font-size:22px;
+  padding:8px 15px;
+  border-radius:16px;
+}
+
+h1{
+  color:var(--bordeaux);
+  font-size:25px;
+  margin-bottom:5px;
+}
+
+.consigne{
+  font-size:17px;
+  margin-bottom:18px;
+}
+
+.aliments{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:15px 0;
+}
+
+.aliment{
+  background:white;
+  border:3px solid var(--or);
+  border-radius:17px;
+  padding:12px 5px;
+  cursor:pointer;
+  user-select:none;
+  transition:.15s;
+}
+
+.aliment:active{
+  transform:scale(.96);
+}
+
+.emoji{
+  font-size:42px;
+  display:block;
+}
+
+.nom{
+  font-weight:bold;
+  margin-top:5px;
+}
+
+.zones{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:18px;
+}
+
+.zone{
+  min-height:180px;
+  border:3px dashed var(--bordeaux);
+  border-radius:18px;
+  padding:10px;
+}
+
+.zone h2{
+  color:var(--bordeaux);
+  font-size:17px;
+  margin:3px 0 10px;
+}
+
+.zone .aliment{
+  display:inline-block;
+  width:46%;
+  margin:3px;
+  padding:7px 3px;
+}
+
+.zone .emoji{
+  font-size:30px;
+}
+
+.zone .nom{
+  font-size:13px;
+}
+
+.boutons{
+  margin-top:18px;
+}
+
+button{
+  border:0;
+  border-radius:18px;
+  padding:13px 24px;
+  font-family:Georgia,serif;
+  font-weight:bold;
+  font-size:18px;
+  cursor:pointer;
+}
+
+#valider{
+  background:var(--bordeaux);
+  color:white;
+}
+
+#rejouer{
+  background:var(--or);
+  color:var(--bordeaux);
+  display:none;
+  margin-left:5px;
+}
+
+#message{
+  min-height:55px;
+  margin-top:15px;
+  font-size:18px;
+  font-weight:bold;
+}
+
+.indication{
+  font-size:14px;
+  font-style:italic;
+  margin:10px 0 0;
+}
+
+@media(max-width:600px){
+  .aliments{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .zones{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .jeu{
+    padding:13px;
+  }
+
+  h1{font-size:21px;}
+  .emoji{font-size:38px;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="logo">Que ferais-tu ?</div>
+
+<div class="jeu">
+
+  <div class="entete">
+    <div class="badge">Défi · Les glucides</div>
+    <div class="chrono">⏱️ <span id="temps">1:00</span></div>
+  </div>
+
+  <h1>Classe les 6 aliments !</h1>
+
+  <div class="consigne">
+    Avec ton adulte, classe les aliments :<br>
+    <strong>avec glucides</strong> ou <strong>sans glucides</strong>.<br>
+    Tu as 1 minute !
+  </div>
+
+  <p class="indication">
+    Touche un aliment, puis touche la catégorie où tu veux le placer.
+  </p>
+
+  <div class="aliments" id="reserve"></div>
+
+  <div class="zones">
+
+    <div class="zone" id="avec" onclick="placer('avec')">
+      <h2>🍞 AVEC GLUCIDES</h2>
+    </div>
+
+    <div class="zone" id="sans" onclick="placer('sans')">
+      <h2>🥩 SANS GLUCIDES</h2>
+    </div>
+
+  </div>
+
+  <div class="boutons">
+    <button id="valider" onclick="valider()">Valider</button>
+    <button id="rejouer" onclick="rejouer()">Rejouer</button>
+  </div>
+
+  <div id="message"></div>
+
+</div>
+
+<script>
+
+const aliments = [
+  {nom:"Bonbon", emoji:"🍬", bonne:"avec"},
+  {nom:"Pâtes", emoji:"🍝", bonne:"avec"},
+  {nom:"Lentilles", emoji:"🫘", bonne:"avec"},
+  {nom:"Beurre", emoji:"🧈", bonne:"sans"},
+  {nom:"Steak haché", emoji:"🥩", bonne:"sans"},
+  {nom:"Courgette", emoji:"🥒", bonne:"sans"}
+];
+
+let selection = null;
+let temps = 60;
+let timer = null;
+
+function melanger(tableau){
+  return [...tableau].sort(() => Math.random() - 0.5);
+}
+
+function creerAliment(a){
+
+  const div = document.createElement("div");
+  div.className = "aliment";
+  div.dataset.nom = a.nom;
+  div.dataset.bonne = a.bonne;
+
+  div.innerHTML =
+    '<span class="emoji">'+a.emoji+'</span>'+
+    '<div class="nom">'+a.nom+'</div>';
+
+  div.onclick = function(e){
+    e.stopPropagation();
+
+    document.querySelectorAll(".aliment")
+      .forEach(x => x.style.outline="none");
+
+    selection = div;
+    div.style.outline="4px solid #4f7b58";
+  };
+
+  return div;
+}
+
+function demarrer(){
+
+  const reserve = document.getElementById("reserve");
+  reserve.innerHTML="";
+
+  melanger(aliments).forEach(a=>{
+    reserve.appendChild(creerAliment(a));
+  });
+
+  clearInterval(timer);
+  temps=60;
+  afficherTemps();
+
+  timer=setInterval(()=>{
+    temps--;
+    afficherTemps();
+
+    if(temps<=0){
+      clearInterval(timer);
+      document.getElementById("message").innerHTML =
+        "⏰ Le temps est écoulé ! Tu peux quand même terminer ton classement.";
+    }
+  },1000);
+}
+
+function afficherTemps(){
+  const secondes = temps < 10 ? "0"+temps : temps;
+  document.getElementById("temps").textContent="0:"+secondes;
+}
+
+function placer(zone){
+
+  if(!selection) return;
+
+  document.getElementById(zone).appendChild(selection);
+  selection.style.outline="none";
+  selection=null;
+}
+
+function valider(){
+
+  const reserve=document.getElementById("reserve");
+
+  if(reserve.children.length>0){
+    document.getElementById("message").innerHTML =
+      "👀 Il reste encore des aliments à classer !";
+    return;
+  }
+
+  let correct=true;
+
+  document.querySelectorAll("#avec .aliment").forEach(a=>{
+    if(a.dataset.bonne!=="avec") correct=false;
+  });
+
+  document.querySelectorAll("#sans .aliment").forEach(a=>{
+    if(a.dataset.bonne!=="sans") correct=false;
+  });
+
+  clearInterval(timer);
+
+  if(correct){
+    document.getElementById("message").innerHTML =
+      "🎉 Bravo ! Bonbon, pâtes et lentilles sont du côté AVEC GLUCIDES.";
+  }else{
+    document.getElementById("message").innerHTML =
+      "💡 Pas tout à fait ! Regarde bien les aliments et essaie encore.";
+  }
+
+  document.getElementById("rejouer").style.display="inline-block";
+}
+
+function rejouer(){
+
+  document.getElementById("avec").innerHTML =
+    "<h2>🍞 AVEC GLUCIDES</h2>";
+
+  document.getElementById("sans").innerHTML =
+    "<h2>🥩 SANS GLUCIDES</h2>";
+
+  document.getElementById("message").innerHTML="";
+  document.getElementById("rejouer").style.display="none";
+
+  selection=null;
+  demarrer();
+}
+
+demarrer();
+
+</script>
+
+</body>
+</html>
