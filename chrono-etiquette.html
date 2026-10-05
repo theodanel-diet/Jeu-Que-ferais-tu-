@@ -27,13 +27,13 @@ body {
 
 h1 {
   color: #5b2b2c;
-  margin: 6px 0;
+  margin: 6px 0 12px;
   font-size: 30px;
 }
 
 .intro {
-  line-height: 1.4;
-  margin-bottom: 15px;
+  line-height: 1.5;
+  margin-bottom: 14px;
 }
 
 .timer {
@@ -51,10 +51,10 @@ h1 {
   background: #fff8e9;
   border: 2px solid #e7ad43;
   border-radius: 14px;
-  padding: 12px;
+  padding: 14px;
   margin-bottom: 14px;
   font-weight: bold;
-  min-height: 50px;
+  line-height: 1.6;
 }
 
 .image-wrap {
@@ -71,18 +71,19 @@ h1 {
   border-radius: 12px;
 }
 
-/* Zones invisibles placées sur l'emballage */
+/* Zones tactiles totalement invisibles */
 
 .target {
   position: absolute;
   cursor: pointer;
   background: transparent;
   border: none;
+  outline: none;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Tableau nutritionnel :
-   ligne Glucides / colonne 100 g */
+/* Glucides pour 100 g */
 #carbs100 {
   left: 49%;
   top: 48%;
@@ -90,8 +91,7 @@ h1 {
   height: 5%;
 }
 
-/* Tableau nutritionnel :
-   ligne Glucides / colonne portion */
+/* Glucides par portion */
 #carbsPortion {
   left: 60%;
   top: 48%;
@@ -108,17 +108,14 @@ h1 {
 }
 
 .feedback {
-  min-height: 28px;
+  min-height: 32px;
   margin-top: 12px;
   font-weight: bold;
+  line-height: 1.4;
 }
 
 .correct {
   color: #4f7b58;
-}
-
-.wrong {
-  color: #a54b43;
 }
 
 button.control {
@@ -149,7 +146,7 @@ button.control {
   padding: 15px;
   border-radius: 14px;
   font-weight: bold;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .success {
@@ -163,20 +160,6 @@ button.control {
   background: #f2d8d5;
   color: #7b3732;
 }
-
-.finished-target {
-  outline: 3px solid #4f7b58;
-  outline-offset: 2px;
-  border-radius: 5px;
-  background: rgba(79,123,88,0.12);
-}
-
-.reveal-target {
-  outline: 3px solid #e7ad43;
-  outline-offset: 2px;
-  border-radius: 5px;
-  background: rgba(231,173,67,0.18);
-}
 </style>
 </head>
 
@@ -187,11 +170,7 @@ button.control {
 <h1>⏱️ Chrono étiquette</h1>
 
 <p class="intro">
-Tu as <strong>30 secondes</strong> pour retrouver sur cet emballage :
-<br><br>
-<strong>• les glucides pour 100 g</strong><br>
-<strong>• les glucides par portion</strong><br>
-<strong>• la liste des ingrédients</strong>
+Observe bien l'emballage puis lance le chrono quand tu es prêt !
 </p>
 
 <div class="timer" id="timer">30 s</div>
@@ -210,14 +189,23 @@ Liste des ingrédients
     alt="Dos d'un paquet de céréales avec tableau nutritionnel et liste des ingrédients"
   >
 
-  <button class="target" id="carbs100"
-    aria-label="Glucides pour 100 grammes"></button>
+  <button
+    class="target"
+    id="carbs100"
+    aria-label="Glucides pour 100 grammes">
+  </button>
 
-  <button class="target" id="carbsPortion"
-    aria-label="Glucides par portion"></button>
+  <button
+    class="target"
+    id="carbsPortion"
+    aria-label="Glucides par portion">
+  </button>
 
-  <button class="target" id="ingredients"
-    aria-label="Liste des ingrédients"></button>
+  <button
+    class="target"
+    id="ingredients"
+    aria-label="Liste des ingrédients">
+  </button>
 
 </div>
 
@@ -237,31 +225,13 @@ Rejouer
 
 <script>
 
-const missions = [
-  {
-    id: "carbs100",
-    text: "Trouve les glucides pour 100 g",
-    answer: "68 g pour 100 g"
-  },
-  {
-    id: "carbsPortion",
-    text: "Trouve les glucides pour une portion de 30 g",
-    answer: "20,4 g par portion"
-  },
-  {
-    id: "ingredients",
-    text: "Trouve la liste des ingrédients",
-    answer: "Liste des ingrédients trouvée"
-  }
-];
-
-let currentMission = 0;
 let timeLeft = 30;
 let timerInterval = null;
 let started = false;
 
+const foundTargets = new Set();
+
 const timer = document.getElementById("timer");
-const mission = document.getElementById("mission");
 const feedback = document.getElementById("feedback");
 const result = document.getElementById("result");
 const startButton = document.getElementById("start");
@@ -271,13 +241,11 @@ function startGame() {
 
   clearInterval(timerInterval);
 
-  currentMission = 0;
   timeLeft = 30;
   started = true;
+  foundTargets.clear();
 
   timer.textContent = "30 s";
-
-  
 
   feedback.textContent = "";
   feedback.className = "feedback";
@@ -288,13 +256,6 @@ function startGame() {
 
   startButton.style.display = "none";
   replayButton.style.display = "none";
-
-  document.querySelectorAll(".target").forEach(target => {
-    target.classList.remove(
-      "finished-target",
-      "reveal-target"
-    );
-  });
 
   timerInterval = setInterval(() => {
 
@@ -313,37 +274,30 @@ function targetPressed(id) {
 
   if (!started) return;
 
-  const target = document.getElementById(id);
-
-  // Si cette information a déjà été trouvée,
-  // on ne la compte pas deux fois.
-  if (target.classList.contains("finished-target")) {
+  if (foundTargets.has(id)) {
     return;
   }
 
-  target.classList.add("finished-target");
-
-  let answer = "";
+  foundTargets.add(id);
 
   if (id === "carbs100") {
-    answer = "✅ Glucides pour 100 g trouvés : 68 g";
+    feedback.textContent =
+      "✅ Glucides pour 100 g trouvés : 68 g";
   }
 
   if (id === "carbsPortion") {
-    answer = "✅ Glucides par portion trouvés : 20,4 g";
+    feedback.textContent =
+      "✅ Glucides par portion trouvés : 20,4 g";
   }
 
   if (id === "ingredients") {
-    answer = "✅ Liste des ingrédients trouvée";
+    feedback.textContent =
+      "✅ Liste des ingrédients trouvée";
   }
 
-  feedback.textContent = answer;
   feedback.className = "feedback correct";
 
-  const found =
-    document.querySelectorAll(".target.finished-target").length;
-
-  if (found === 3) {
+  if (foundTargets.size === 3) {
     endGame(true);
   }
 }
@@ -359,9 +313,6 @@ function endGame(success) {
 
     const elapsed = 30 - timeLeft;
 
-    mission.textContent =
-      "Mission accomplie !";
-
     result.className = "success";
 
     result.innerHTML =
@@ -375,17 +326,15 @@ function endGame(success) {
 
     timer.textContent = "0 s";
 
-    mission.textContent =
-      "Temps écoulé !";
-
     result.className = "fail";
 
     result.innerHTML =
-      "⏱️ Temps écoulé ! Les bonnes zones sont maintenant indiquées. Observe-les puis essaie à nouveau.";
-
-    document.querySelectorAll(".target").forEach(target => {
-      target.classList.add("reveal-target");
-    });
+      "⏱️ Temps écoulé !<br><br>" +
+      "<strong>Les réponses étaient :</strong><br>" +
+      "Glucides pour 100 g : <strong>68 g</strong><br>" +
+      "Glucides par portion : <strong>20,4 g</strong><br>" +
+      "Liste des ingrédients : <strong>à droite du tableau nutritionnel</strong><br><br>" +
+      "Observe l'emballage puis essaie à nouveau !";
   }
 }
 
