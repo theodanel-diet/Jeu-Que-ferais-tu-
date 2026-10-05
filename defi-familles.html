@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Défi — Les familles d'aliments</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 18px;
+  background: #f4e6c7;
+  color: #352724;
+  font-family: Georgia, "Times New Roman", serif;
+  text-align: center;
+}
+
+.game {
+  max-width: 720px;
+  margin: auto;
+}
+
+h1 {
+  color: #5b2b2c;
+  margin: 8px 0 6px;
+  font-size: 30px;
+}
+
+.intro {
+  margin: 0 auto 18px;
+  max-width: 600px;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.status {
+  background: #fff8e9;
+  border: 2px solid #e7ad43;
+  border-radius: 14px;
+  padding: 10px;
+  margin-bottom: 18px;
+  font-weight: bold;
+}
+
+.foods {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.food {
+  background: #fff8e9;
+  border: 3px solid transparent;
+  border-radius: 14px;
+  padding: 5px;
+  cursor: pointer;
+  transition: 0.15s;
+  min-height: 120px;
+}
+
+.food img {
+  width: 100%;
+  height: 115px;
+  object-fit: contain;
+  display: block;
+  border-radius: 10px;
+}
+
+.food.selected {
+  border-color: #5b2b2c;
+  transform: scale(1.03);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.food.placed {
+  display: none;
+}
+
+h2 {
+  color: #5b2b2c;
+  font-size: 22px;
+  margin: 10px 0 14px;
+}
+
+.families {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.family {
+  background: #fff8e9;
+  border: 2px solid #e7ad43;
+  border-radius: 14px;
+  padding: 12px 10px;
+  cursor: pointer;
+  min-height: 72px;
+}
+
+.family-title {
+  font-weight: bold;
+  color: #5b2b2c;
+  font-size: 16px;
+}
+
+.family-items {
+  margin-top: 7px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.family-items span {
+  display: inline-block;
+  background: #f4e6c7;
+  border-radius: 8px;
+  padding: 4px 7px;
+  margin: 2px;
+}
+
+.actions {
+  margin-top: 22px;
+}
+
+button {
+  border: none;
+  border-radius: 12px;
+  padding: 13px 20px;
+  margin: 5px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#check {
+  background: #5b2b2c;
+  color: white;
+}
+
+#replay {
+  background: #e7ad43;
+  color: #352724;
+}
+
+#result {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: bold;
+  display: none;
+}
+
+.success {
+  display: block !important;
+  background: #dcebdc;
+  color: #35543c;
+}
+
+.error {
+  display: block !important;
+  background: #f2d8d5;
+  color: #7b3732;
+}
+
+@media (min-width: 600px) {
+  .foods {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .families {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+<h1>Défi : les familles d'aliments</h1>
+
+<p class="intro">
+Choisis un aliment, puis touche la famille à laquelle il appartient.
+Classe les 14 aliments avant de vérifier tes réponses !
+</p>
+
+<div class="status" id="status">
+14 aliments à classer
+</div>
+
+<div class="foods" id="foods"></div>
+
+<h2>Les familles</h2>
+
+<div class="families">
+
+  <div class="family" data-family="fruits-legumes">
+    <div class="family-title">🥕 Fruits et légumes</div>
+    <div class="family-items"></div>
+  </div>
+
+  <div class="family" data-family="feculents">
+    <div class="family-title">🍞 Féculents</div>
+    <div class="family-items"></div>
+  </div>
+
+  <div class="family" data-family="laitiers">
+    <div class="family-title">🥛 Produits laitiers</div>
+    <div class="family-items"></div>
+  </div>
+
+  <div class="family" data-family="proteines">
+    <div class="family-title">🍗 Viandes / poissons / œufs</div>
+    <div class="family-items"></div>
+  </div>
+
+  <div class="family" data-family="matieres-grasses">
+    <div class="family-title">🧈 Matières grasses</div>
+    <div class="family-items"></div>
+  </div>
+
+  <div class="family" data-family="produits-sucres">
+    <div class="family-title">🍫 Produits sucrés</div>
+    <div class="family-items"></div>
+  </div>
+
+  <div class="family" data-family="boissons-sucrees">
+    <div class="family-title">🥤 Boissons sucrées</div>
+    <div class="family-items"></div>
+  </div>
+
+</div>
+
+<div class="actions">
+  <button id="check">Vérifier mes réponses</button>
+  <button id="replay">Rejouer</button>
+</div>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+const foods = [
+  {name:"Pomme", image:"pomme.png", family:"fruits-legumes"},
+  {name:"Carotte", image:"carotte.png", family:"fruits-legumes"},
+
+  {name:"Pain", image:"pain.png", family:"feculents"},
+  {name:"Pâtes", image:"pates.png", family:"feculents"},
+
+  {name:"Lait", image:"lait.png", family:"laitiers"},
+  {name:"Yaourt nature", image:"yaourt-nature.png", family:"laitiers"},
+
+  {name:"Poulet", image:"poulet.png", family:"proteines"},
+  {name:"Œuf", image:"oeuf.png", family:"proteines"},
+
+  {name:"Beurre", image:"beurre.png", family:"matieres-grasses"},
+  {name:"Huile d'olive", image:"huile-olive.png", family:"matieres-grasses"},
+
+  {name:"Bonbon", image:"bonbon.png", family:"produits-sucres"},
+  {name:"Chocolat", image:"chocolat.png", family:"produits-sucres"},
+
+  {name:"Soda", image:"soda.png", family:"boissons-sucrees"},
+  {name:"Jus de fruits", image:"jus-fruits.png", family:"boissons-sucrees"}
+];
+
+let selected = null;
+let answers = {};
+
+const foodsContainer = document.getElementById("foods");
+const status = document.getElementById("status");
+const result = document.getElementById("result");
+
+function shuffle(array) {
+  return [...array].sort(() => Math.random() - 0.5);
+}
+
+function startGame() {
+
+  selected = null;
+  answers = {};
+  foodsContainer.innerHTML = "";
+
+  document.querySelectorAll(".family-items").forEach(zone => {
+    zone.innerHTML = "";
+  });
+
+  result.className = "";
+  result.style.display = "none";
+  result.innerHTML = "";
+
+  shuffle(foods).forEach(food => {
+
+    const card = document.createElement("div");
+    card.className = "food";
+    card.dataset.name = food.name;
+
+    /* Le nom est DÉJÀ dans l'image :
+       on n'ajoute donc aucun texte ici 😎 */
+    card.innerHTML = `
+      <img src="${food.image}" alt="${food.name}">
+    `;
+
+    card.addEventListener("click", () => {
+
+      document.querySelectorAll(".food").forEach(c => {
+        c.classList.remove("selected");
+      });
+
+      selected = food.name;
+      card.classList.add("selected");
+    });
+
+    foodsContainer.appendChild(card);
+  });
+
+  updateStatus();
+}
+
+document.querySelectorAll(".family").forEach(zone => {
+
+  zone.addEventListener("click", () => {
+
+    if (!selected) return;
+
+    const previousFamily = answers[selected];
+
+    if (previousFamily) {
+      const previousZone = document.querySelector(
+        `.family[data-family="${previousFamily}"] .family-items`
+      );
+
+      const previousLabel = previousZone.querySelector(
+        `[data-item="${CSS.escape(selected)}"]`
+      );
+
+      if (previousLabel) previousLabel.remove();
+    }
+
+    answers[selected] = zone.dataset.family;
+
+    const label = document.createElement("span");
+    label.textContent = selected;
+    label.dataset.item = selected;
+
+    zone.querySelector(".family-items").appendChild(label);
+
+    const card = document.querySelector(
+      `.food[data-name="${CSS.escape(selected)}"]`
+    );
+
+    card.classList.remove("selected");
+    card.classList.add("placed");
+
+    selected = null;
+
+    updateStatus();
+  });
+});
+
+function updateStatus() {
+
+  const remaining = foods.length - Object.keys(answers).length;
+
+  if (remaining === 0) {
+    status.textContent = "Tous les aliments sont classés ! 🎉";
+  } else if (remaining === 1) {
+    status.textContent = "1 aliment à classer";
+  } else {
+    status.textContent = remaining + " aliments à classer";
+  }
+}
+
+document.getElementById("check").addEventListener("click", () => {
+
+  if (Object.keys(answers).length < foods.length) {
+    result.className = "error";
+    result.innerHTML = "Il reste encore des aliments à classer 👀";
+    return;
+  }
+
+  let correct = 0;
+
+  foods.forEach(food => {
+    if (answers[food.name] === food.family) {
+      correct++;
+    }
+  });
+
+  if (correct === foods.length) {
+
+    result.className = "success";
+    result.innerHTML =
+      "Bravo ! 🎉 Les 14 aliments sont dans la bonne famille !";
+
+  } else {
+
+    result.className = "error";
+    result.innerHTML =
+      "Tu as " + correct + " bonne" +
+      (correct > 1 ? "s" : "") +
+      " réponse" +
+      (correct > 1 ? "s" : "") +
+      " sur 14. Rejoue pour essayer de toutes les retrouver ! 💪";
+  }
+});
+
+document.getElementById("replay").addEventListener("click", startGame);
+
+startGame();
+
+</script>
+
+</body>
+</html>
