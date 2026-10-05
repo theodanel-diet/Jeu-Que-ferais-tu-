@@ -99,9 +99,15 @@ h1{
   transform:scale(.96);
 }
 
-.emoji{
-  font-size:42px;
+.aliment-image{
+  width:100px;
+  height:80px;
   display:block;
+  margin:0 auto;
+  background-image:url("aliments.png");
+  background-size:300% 200%;
+  background-repeat:no-repeat;
+  border-radius:12px;
 }
 
 .nom{
@@ -136,8 +142,9 @@ h1{
   padding:7px 3px;
 }
 
-.zone .emoji{
-  font-size:30px;
+.zone .aliment-image{
+  width:70px;
+  height:55px;
 }
 
 .zone .nom{
@@ -230,11 +237,11 @@ button{
   <div class="zones">
 
     <div class="zone" id="avec" onclick="placer('avec')">
-      <h2>🍞 AVEC GLUCIDES</h2>
+      <h2>AVEC GLUCIDES</h2>
     </div>
 
     <div class="zone" id="sans" onclick="placer('sans')">
-      <h2>🥩 SANS GLUCIDES</h2>
+     <h2>SANS GLUCIDES</h2>
     </div>
 
   </div>
@@ -251,13 +258,12 @@ button{
 <script>
 
 const aliments = [
- const aliments = [
-  {nom:"Bonbon", emoji:"🍬", bonne:"avec"},
-  {nom:"Pâtes", emoji:"🍝", bonne:"avec"},
-  {nom:"Lentilles", emoji:"●", bonne:"avec"},
-  {nom:"Beurre", emoji:"▰", bonne:"sans"},
-  {nom:"Steak haché", emoji:"🥩", bonne:"sans"},
-  {nom:"Courgette", emoji:"🥒", bonne:"sans"}
+  {nom:"Bonbon", position:"0% 0%", bonne:"avec"},
+  {nom:"Pâtes", position:"50% 0%", bonne:"avec"},
+  {nom:"Lentilles", position:"100% 0%", bonne:"avec"},
+  {nom:"Beurre", position:"0% 100%", bonne:"sans"},
+  {nom:"Steak haché", position:"50% 100%", bonne:"sans"},
+  {nom:"Courgette", position:"100% 100%", bonne:"sans"}
 ];
 
 let selection = null;
@@ -276,9 +282,9 @@ function creerAliment(a){
   div.dataset.bonne = a.bonne;
 
   div.innerHTML =
-    '<span class="emoji">'+a.emoji+'</span>'+
-    '<div class="nom">'+a.nom+'</div>';
-
+  '<span class="aliment-image" style="background-position:'+a.position+'"></span>' +
+  '<div class="nom">'+a.nom+'</div>';
+  
   div.onclick = function(e){
     e.stopPropagation();
 
@@ -367,10 +373,10 @@ function valider(){
 function rejouer(){
 
   document.getElementById("avec").innerHTML =
-    "<h2>🍞 AVEC GLUCIDES</h2>";
+<h2>AVEC GLUCIDES</h2>
 
   document.getElementById("sans").innerHTML =
-    "<h2>🥩 SANS GLUCIDES</h2>";
+    "<h2>SANS GLUCIDES</h2>";
 
   document.getElementById("message").innerHTML="";
   document.getElementById("rejouer").style.display="none";
