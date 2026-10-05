@@ -84,27 +84,27 @@ h1 {
 /* Tableau nutritionnel :
    ligne Glucides / colonne 100 g */
 #carbs100 {
-  left: 30%;
-  top: 39%;
-  width: 9%;
-  height: 4%;
+  left: 49%;
+  top: 48%;
+  width: 11%;
+  height: 5%;
 }
 
 /* Tableau nutritionnel :
    ligne Glucides / colonne portion */
 #carbsPortion {
-  left: 39%;
-  top: 39%;
-  width: 10%;
-  height: 4%;
+  left: 60%;
+  top: 48%;
+  width: 12%;
+  height: 5%;
 }
 
 /* Liste des ingrédients */
 #ingredients {
-  left: 26%;
-  top: 58%;
-  width: 25%;
-  height: 12%;
+  left: 74%;
+  top: 35%;
+  width: 22%;
+  height: 22%;
 }
 
 .feedback {
@@ -197,7 +197,10 @@ Tu as <strong>30 secondes</strong> pour retrouver sur cet emballage :
 <div class="timer" id="timer">30 s</div>
 
 <div class="mission" id="mission">
-Appuie sur « Démarrer » quand tu es prêt !
+<strong>À retrouver en 30 secondes :</strong><br><br>
+Glucides pour 100 g<br>
+Glucides par portion<br>
+Liste des ingrédients
 </div>
 
 <div class="image-wrap">
@@ -274,7 +277,7 @@ function startGame() {
 
   timer.textContent = "30 s";
 
-  mission.textContent = "1/3 — " + missions[0].text;
+  
 
   feedback.textContent = "";
   feedback.className = "feedback";
@@ -310,46 +313,38 @@ function targetPressed(id) {
 
   if (!started) return;
 
-  const expected = missions[currentMission];
+  const target = document.getElementById(id);
 
-  if (id === expected.id) {
+  // Si cette information a déjà été trouvée,
+  // on ne la compte pas deux fois.
+  if (target.classList.contains("finished-target")) {
+    return;
+  }
 
-    document
-      .getElementById(id)
-      .classList.add("finished-target");
+  target.classList.add("finished-target");
 
-    feedback.textContent =
-      "✅ " + expected.answer;
+  let answer = "";
 
-    feedback.className = "feedback correct";
+  if (id === "carbs100") {
+    answer = "✅ Glucides pour 100 g trouvés : 68 g";
+  }
 
-    currentMission++;
+  if (id === "carbsPortion") {
+    answer = "✅ Glucides par portion trouvés : 20,4 g";
+  }
 
-    if (currentMission === missions.length) {
+  if (id === "ingredients") {
+    answer = "✅ Liste des ingrédients trouvée";
+  }
 
-      endGame(true);
-      return;
-    }
+  feedback.textContent = answer;
+  feedback.className = "feedback correct";
 
-    setTimeout(() => {
+  const found =
+    document.querySelectorAll(".target.finished-target").length;
 
-      if (!started) return;
-
-      mission.textContent =
-        (currentMission + 1) +
-        "/3 — " +
-        missions[currentMission].text;
-
-      feedback.textContent = "";
-
-    }, 650);
-
-  } else {
-
-    feedback.textContent =
-      "👀 Ce n'est pas cette information. Cherche encore !";
-
-    feedback.className = "feedback wrong";
+  if (found === 3) {
+    endGame(true);
   }
 }
 
