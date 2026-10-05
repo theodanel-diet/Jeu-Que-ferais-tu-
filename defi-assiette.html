@@ -1,1 +1,428 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compose ton assiette - Que ferais-tu ?</title>
 
+<style>
+:root{
+  --creme:#f4e6c7;
+  --papier:#fff8e9;
+  --or:#e7ad43;
+  --bordeaux:#5b2b2c;
+  --vert:#4f7b58;
+  --texte:#352724;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  padding:18px;
+  background:var(--creme);
+  color:var(--texte);
+  font-family:Georgia,serif;
+  text-align:center;
+}
+
+.logo{
+  color:var(--bordeaux);
+  font-size:30px;
+  font-weight:bold;
+  margin:8px 0 14px;
+}
+
+.jeu{
+  max-width:850px;
+  margin:auto;
+  background:var(--papier);
+  border:3px solid var(--bordeaux);
+  border-radius:24px;
+  padding:18px;
+}
+
+.badge{
+  display:inline-block;
+  background:var(--or);
+  color:var(--bordeaux);
+  font-weight:bold;
+  padding:9px 18px;
+  border-radius:20px;
+}
+
+h1{
+  color:var(--bordeaux);
+  font-size:25px;
+  margin-bottom:5px;
+}
+
+.consigne{
+  font-size:17px;
+  line-height:1.4;
+}
+
+.indication{
+  font-size:14px;
+  font-style:italic;
+}
+
+/* ALIMENTS */
+
+.aliments{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:9px;
+  margin:18px 0;
+}
+
+.aliment{
+  background:white;
+  border:3px solid var(--or);
+  border-radius:15px;
+  padding:10px 5px;
+  font-weight:bold;
+  cursor:pointer;
+  min-height:55px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.15s;
+}
+
+.aliment:active{
+  transform:scale(.96);
+}
+
+.aliment.selectionne{
+  outline:4px solid var(--vert);
+}
+
+/* ASSIETTE */
+
+.assiette{
+  width:min(500px,100%);
+  aspect-ratio:1;
+  margin:20px auto;
+  border:10px solid #eee2ca;
+  border-radius:50%;
+  background:white;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr;
+  overflow:hidden;
+  box-shadow:0 4px 12px rgba(0,0,0,.12);
+}
+
+.zone{
+  cursor:pointer;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-width:0;
+}
+
+.zone-legumes{
+  grid-row:1 / 3;
+  background:#dce7c9;
+  border-right:4px solid white;
+}
+
+.zone-feculents{
+  background:#f4d48b;
+  border-bottom:4px solid white;
+}
+
+.zone-proteines{
+  background:#e9c4ad;
+}
+
+.zone h2{
+  margin:0 0 8px;
+  color:var(--bordeaux);
+  font-size:17px;
+}
+
+.contenu-zone{
+  font-weight:bold;
+  font-size:18px;
+  min-height:25px;
+}
+
+.vide{
+  font-size:13px;
+  font-weight:normal;
+  opacity:.6;
+}
+
+/* BOUTONS */
+
+button{
+  border:0;
+  border-radius:18px;
+  padding:13px 24px;
+  font-family:Georgia,serif;
+  font-weight:bold;
+  font-size:18px;
+  cursor:pointer;
+}
+
+#valider{
+  background:var(--bordeaux);
+  color:white;
+}
+
+#rejouer{
+  background:var(--or);
+  color:var(--bordeaux);
+  display:none;
+  margin-left:5px;
+}
+
+#message{
+  min-height:60px;
+  margin-top:15px;
+  font-size:18px;
+  font-weight:bold;
+  line-height:1.4;
+}
+
+@media(max-width:600px){
+  .jeu{padding:12px}
+
+  .aliments{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .aliment{
+    font-size:13px;
+  }
+
+  h1{font-size:22px}
+
+  .zone h2{
+    font-size:14px;
+  }
+
+  .contenu-zone{
+    font-size:14px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="logo">Que ferais-tu ?</div>
+
+<div class="jeu">
+
+  <div class="badge">Défi · Mon assiette</div>
+
+  <h1>Compose ton assiette !</h1>
+
+  <p class="consigne">
+    Choisis <strong>un légume</strong>,
+    <strong>un féculent</strong> et
+    <strong>une source de protéines</strong>.
+    <br>
+    Attention, quelques pièges se sont glissés parmi les aliments !
+  </p>
+
+  <p class="indication">
+    Touche un aliment, puis touche le compartiment où tu veux le placer.
+  </p>
+
+  <div class="aliments" id="aliments"></div>
+
+  <div class="assiette">
+
+    <div class="zone zone-legumes" data-zone="legumes">
+      <h2>LÉGUMES</h2>
+      <div class="contenu-zone" id="legumes">
+        <span class="vide">Choisis un aliment</span>
+      </div>
+    </div>
+
+    <div class="zone zone-feculents" data-zone="feculents">
+      <h2>FÉCULENTS</h2>
+      <div class="contenu-zone" id="feculents">
+        <span class="vide">Choisis un aliment</span>
+      </div>
+    </div>
+
+    <div class="zone zone-proteines" data-zone="proteines">
+      <h2>PROTÉINES</h2>
+      <div class="contenu-zone" id="proteines">
+        <span class="vide">Choisis un aliment</span>
+      </div>
+    </div>
+
+  </div>
+
+  <button id="valider">Valider mon assiette</button>
+  <button id="rejouer">Rejouer</button>
+
+  <div id="message"></div>
+
+</div>
+
+<script>
+
+const aliments = [
+  {nom:"Brocoli", categorie:"legumes"},
+  {nom:"Carotte", categorie:"legumes"},
+  {nom:"Courgette", categorie:"legumes"},
+
+  {nom:"Riz", categorie:"feculents"},
+  {nom:"Pâtes", categorie:"feculents"},
+  {nom:"Pommes de terre", categorie:"feculents"},
+
+  {nom:"Lentilles", categorie:"proteines"},
+  {nom:"Œuf", categorie:"proteines"},
+  {nom:"Poisson", categorie:"proteines"},
+  {nom:"Poulet", categorie:"proteines"},
+
+  {nom:"Frites", categorie:"piege"},
+  {nom:"Burger", categorie:"piege"},
+  {nom:"Pizza", categorie:"piege"},
+  {nom:"Nuggets", categorie:"piege"},
+  {nom:"Cookie", categorie:"piege"}
+];
+
+let selection = null;
+
+const choix = {
+  legumes:null,
+  feculents:null,
+  proteines:null
+};
+
+function melanger(tableau){
+  return [...tableau].sort(() => Math.random() - 0.5);
+}
+
+function demarrer(){
+
+  selection=null;
+
+  choix.legumes=null;
+  choix.feculents=null;
+  choix.proteines=null;
+
+  const conteneur=document.getElementById("aliments");
+  conteneur.innerHTML="";
+
+  melanger(aliments).forEach(a=>{
+
+    const bouton=document.createElement("div");
+
+    bouton.className="aliment";
+    bouton.textContent=a.nom;
+    bouton.dataset.nom=a.nom;
+    bouton.dataset.categorie=a.categorie;
+
+    bouton.addEventListener("click",()=>{
+
+      document.querySelectorAll(".aliment")
+        .forEach(x=>x.classList.remove("selectionne"));
+
+      selection=a;
+      bouton.classList.add("selectionne");
+
+    });
+
+    conteneur.appendChild(bouton);
+
+  });
+
+  afficherZones();
+
+  document.getElementById("message").textContent="";
+  document.getElementById("rejouer").style.display="none";
+}
+
+function afficherZones(){
+
+  ["legumes","feculents","proteines"].forEach(zone=>{
+
+    const emplacement=document.getElementById(zone);
+
+    if(choix[zone]){
+      emplacement.textContent=choix[zone].nom;
+    }else{
+      emplacement.innerHTML='<span class="vide">Choisis un aliment</span>';
+    }
+
+  });
+
+}
+
+document.querySelectorAll(".zone").forEach(zone=>{
+
+  zone.addEventListener("click",()=>{
+
+    if(!selection) return;
+
+    const destination=zone.dataset.zone;
+
+    choix[destination]=selection;
+
+    selection=null;
+
+    document.querySelectorAll(".aliment")
+      .forEach(x=>x.classList.remove("selectionne"));
+
+    afficherZones();
+
+  });
+
+});
+
+document.getElementById("valider").addEventListener("click",()=>{
+
+  const message=document.getElementById("message");
+
+  if(!choix.legumes || !choix.feculents || !choix.proteines){
+
+    message.textContent=
+      "Il manque encore un aliment dans ton assiette !";
+
+    return;
+  }
+
+  const legumesOK =
+    choix.legumes.categorie==="legumes";
+
+  const feculentsOK =
+    choix.feculents.categorie==="feculents";
+
+  const proteinesOK =
+    choix.proteines.categorie==="proteines";
+
+  if(legumesOK && feculentsOK && proteinesOK){
+
+    message.textContent=
+      "Bravo ! Ton assiette contient un légume, un féculent et une source de protéines !";
+
+  }else{
+
+    message.textContent=
+      "Il y a un petit piège dans ton assiette. Regarde bien tes choix et essaie encore !";
+
+  }
+
+  document.getElementById("rejouer").style.display="inline-block";
+
+});
+
+document.getElementById("rejouer").addEventListener("click",demarrer);
+
+demarrer();
+
+</script>
+
+</body>
+</html>
